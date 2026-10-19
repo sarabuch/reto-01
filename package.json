@@ -7,6 +7,7 @@
     "dev": "bun --watch src/server.ts",
     "start": "bun src/server.ts",
     "demo": "bun run demo.ts",
+    "modulo": "bun run scripts/empaquetar-modulo.ts",
     "test": "bun test"
   },
   "dependencies": {

@@ -171,8 +171,8 @@ Además de las historias: **\[propio\]**
 | --- | --- | --- |
 | Front de chat (historial, "pensando", tool calls, confirmación resaltada) | Hecho | Autenticación si deja de ser una demo |
 | Link público (Render) | Hecho, con latencia variable por la capa gratuita de Gemini | Plan pago del modelo y de Render (sin suspensión) |
-| `demo.ts` sin modelo y 20 pruebas (`bun test`) | Hecho | Pruebas con plantillas reales |
-| Bonus `modulo/` (sección 9.4 del PRD) | No hecho | Empaquetar `agent.md`, `tools/` y `SKILL.md` reutilizando los mismos archivos |
+| `demo.ts` sin modelo y 23 pruebas (`bun test`) | Hecho | Pruebas con plantillas reales |
+| Bonus `modulo/` (sección 9.4 del PRD) | Hecho: `agent.md`, `tools/proveedor.ts` y `skill/registro-proveedor/SKILL.md` se generan con `bun run modulo` desde `agent/prompt.md`, `src/tools/` y `src/knowledge/`. Una prueba falla si se desfasan y otra comprueba que las herramientas del módulo dan el mismo resultado que las de la app | Probarlo integrado en una plataforma de agentes real; el bloqueo de envío del servidor no viaja en el módulo |
 
 ## 9. Uso de IA
 
@@ -180,7 +180,7 @@ Además de las historias: **\[propio\]**
 
 - **Claude (chat):** asistencia en la preparación del entorno, planificación del desarrollo, diseño de `CLAUDE.md` y construcción de mockups.
 - **Claude Code:** construcción del código y de los borradores del repositorio. En concreto: **\[propio\]**
-  - **Código:** las herramientas y `demo.ts`; el adaptador de Gemini, el ciclo del agente y el servidor; el front a partir de mi mockup; las pruebas.
+  - **Código:** las herramientas y `demo.ts`; el adaptador de Gemini, el ciclo del agente y el servidor; el front a partir de mi mockup; las pruebas; el empaquetado del módulo reutilizable (bonus).
   - **Investigación:** el modelo gratuito vigente y la compatibilidad de la clave "AQ."; la medición de tokens y costo por caso.
   - **Despliegue y verificación:** la preparación del despliegue en Render (yo creé el servicio y cargué la clave); la verificación por bloque contra el PRD (`docs/COBERTURA.md`).
   - **Documentación:** la guía del código (`docs/GUIA-DEL-CODIGO.md`), el registro de decisiones (`docs/REGISTRO-IA.md`), el README y el primer borrador de este documento.
@@ -225,7 +225,7 @@ Además de las historias: **\[propio\]**
 
 Ejecuté `demo.ts` y los casos de `fixtures/` al cerrar cada bloque, revisé los criterios de las historias de usuario y probé de punta a punta el caso `ec-corp-andina` con el prompt de la sección 11 del PRD. Resultados: **\[propio\]**
 
-**En una línea:** los 4 casos corren con `demo.ts`, pasan 20 pruebas y la sección 11 funciona en el link público.
+**En una línea:** los 4 casos corren con `demo.ts`, pasan 23 pruebas y la sección 11 funciona en el link público.
 
 - **`demo.ts`** procesa los 4 casos sin clave y da la misma salida en dos ejecuciones seguidas. Resultados por caso:
 
@@ -236,7 +236,7 @@ Ejecuté `demo.ts` y los casos de `fixtures/` al cerrar cada bloque, revisé los
   | `hn-agroexport-sula` | 9 llenos, 1 faltante, 1 a confirmar | No listo: Cámara de Comercio y parafiscales vencidos |
   | `pa-logistica-istmo` | Portal: "formato no soportado" y `valores-portal.md` | No listo: Cámara de Comercio vencida |
 
-- **`bun test`**: 20 pruebas pasan. Cubren las reglas RN1 a RN4, HU-2 y HU-5, el panel del caso y el ciclo del agente con un modelo falso (tope de pasos, tope de tokens por sesión, bloqueo del envío y errores del proveedor).
+- **`bun test`**: 23 pruebas pasan. Cubren las reglas RN1 a RN4, HU-2 y HU-5, el panel del caso, el ciclo del agente con un modelo falso (tope de pasos, tope de tokens por sesión, bloqueo del envío y errores del proveedor) y el módulo del bonus (sincronía con la app y mismos resultados).
 - **En el link de Render**, con el prompt de la sección 11:
   - Primer mensaje: 4 herramientas visibles, resumen estructurado, faltante, RUC a confirmar, "no listo para firma" y pregunta de cierre. No se envió nada.
   - "envía": el modelo intentó enviar sin preguntar y el servidor lo bloqueó; después hizo la pregunta de confirmación.

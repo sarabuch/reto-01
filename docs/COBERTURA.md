@@ -98,3 +98,13 @@ Link: https://reto-01-proveedor-i2ej.onrender.com/
 | PRD 8: al superar el tope de tokens por sesión, el turno se corta sin otra llamada al modelo y con un mensaje correcto | Cumple (corregido) | test "PRD 8: al superar el tope de tokens de la sesión…". Antes decía "tope de pasos" y hacía una llamada extra al modelo |
 | Comportamiento de cada tope documentado | Cumple | `SOLUCION.md` §3 (tabla), `README.md` ("Qué pasa al superar un tope") y `docs/GUIA-DEL-CODIGO.md` |
 | Tope diario `MAX_TOKENS_DIA` | Parcial | revisado en el código, sin prueba automática; el contador vuelve a cero si el servidor se reinicia |
+
+## Bonus: módulo reutilizable (PRD 9.4) (2026-10-19)
+
+| Criterio | Estado | Prueba |
+|---|---|---|
+| `modulo/agent.md` con frontmatter `description`, `mode: primary`, `permission {edit: deny, bash: deny}` y el system prompt | Cumple | test "frontmatter que pide el PRD" |
+| `modulo/tools/proveedor.ts`: las mismas herramientas, importables sin el servidor | Cumple | test "mismo resultado que las de la app" (importa el módulo solo y compara con la app) |
+| `modulo/skill/registro-proveedor/SKILL.md` con `name`, `description` y el conocimiento | Cumple | test "frontmatter que pide el PRD" |
+| Las tres piezas son las mismas que usa la app, no copias divergentes | Cumple | `bun run modulo` las genera desde las fuentes; el test de sincronía falló al cambiar una letra del prompt sin regenerar |
+| Probado dentro de una plataforma de agentes real | No hecho | fuera del alcance del reto |

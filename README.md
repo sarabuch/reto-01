@@ -133,11 +133,22 @@ src/agent/                          ciclo del agente y sesiones
 src/server.ts                       API HTTP y archivos del front
 web/                                front de chat (HTML, CSS y JS planos)
 demo.ts                             verificación sin modelo
-tests/                              pruebas de reglas críticas y del ciclo
+tests/                              pruebas de reglas críticas, del ciclo y del módulo
+modulo/                             agente empaquetado (bonus), generado con bun run modulo
 fixtures/reto-01/                   datos de prueba (no se modifican)
 ```
 
 La guía detallada de cada archivo, el recorrido de un pedido y dónde vive cada regla del PRD están en [`docs/GUIA-DEL-CODIGO.md`](docs/GUIA-DEL-CODIGO.md).
+
+## Módulo reutilizable (bonus)
+
+`modulo/` contiene el agente empaquetado para otras plataformas de agentes (PRD 9.4): `agent.md`, `tools/proveedor.ts` y `skill/registro-proveedor/SKILL.md`. Se genera a partir de los mismos archivos que usa la aplicación:
+
+```bash
+bun run modulo
+```
+
+`bun test` falla si `modulo/` se desfasa de esas fuentes. Detalles en [`modulo/README.md`](modulo/README.md).
 
 ## Despliegue en Render
 

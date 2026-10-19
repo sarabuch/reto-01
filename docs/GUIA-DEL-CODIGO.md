@@ -53,6 +53,9 @@ Explicación en lenguaje simple de qué hace cada parte del proyecto. Se actuali
 | `web/estilos.css` | El aspecto visual (verde azulado y neutros cálidos), en modo claro y oscuro. En celular, el panel pasa arriba y se puede plegar. |
 | `web/app.js` | La lógica del chat. Envía mensajes a `/api/chat` y muestra el indicador "pensando", las "llamadas a herramientas" como tarjetas (nombre, argumentos y resultado) y el recuadro "Requiere tu confirmación" con dos botones. Cada botón manda un mensaje tuyo, así que la confirmación sigue siendo explícita (RN4). Después de cada respuesta, pide `/api/casos/<caso>/estado` para el panel. Escapa todo el texto que llega del servidor. |
 | `scripts/probar-clave.ts` | Prueba la clave de Gemini sin mostrarla. Comando: `bun run scripts/probar-clave.ts`. |
+| `scripts/empaquetar-modulo.ts` | Genera `modulo/` (bonus PRD 9.4) a partir de los mismos archivos que usa la app: el prompt, el conocimiento y las herramientas, estas últimas empaquetadas en un solo archivo. Comando: `bun run modulo`. |
+| `modulo/` | El agente empaquetado para otras plataformas: `agent.md`, `tools/proveedor.ts` y `skill/registro-proveedor/SKILL.md`. **No se edita a mano**: se regenera. |
+| `tests/modulo.test.ts` | Falla si `modulo/` se desfasa de las fuentes de la app, y comprueba que sus herramientas dan el mismo resultado que las de la app. |
 | `tests/reglas.test.ts` | Pruebas chicas de las reglas críticas. Comando: `bun test`. |
 | `tests/ciclo.test.ts` | Pruebas del ciclo con un modelo falso (sin clave): tope, confirmación, errores. |
 | `out/` | Lo que genera el sistema. No va al repositorio y se borra al inicio del demo. |

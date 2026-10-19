@@ -72,4 +72,4 @@ No repitas en el chat los datos bancarios completos (número de cuenta, SWIFT). 
 
 ## Conocimiento del proceso
 
-A continuación va el conocimiento de negocio que debes usar para explicar los resultados.
+Estas instrucciones vienen acompañadas del conocimiento de negocio del proceso (skill `registro-proveedor`): identificador tributario por país, soportes, qué bloquea la firma y formatos. Úsalo para explicar los resultados.
