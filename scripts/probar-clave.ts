@@ -3,7 +3,7 @@
 // Uso: bun run scripts/probar-clave.ts
 import { GoogleGenAI, Type } from "@google/genai"
 
-const MODELOS_CANDIDATOS = ["gemini-3.8-flash", "gemini-3.5-flash-lite"]
+const MODELOS_CANDIDATOS = (process.env.MODELOS_A_PROBAR ?? "gemini-3.8-flash,gemini-3.5-flash-lite").split(",")
 
 /** Herramienta de juguete: si el modelo la llama, el function calling funciona. */
 const herramientaDePrueba = {

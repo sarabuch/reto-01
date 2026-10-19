@@ -4,7 +4,7 @@ import { ApiError, GoogleGenAI, type Content, type FunctionDeclaration, type Par
 import { exito, fallo, mensajeDeError, type Resultado } from "../tools/contrato"
 import type { DefinicionHerramienta, LlamadaHerramienta, Mensaje, ProveedorLLM, RespuestaModelo } from "./adapter"
 
-type OpcionesGemini = { clave: string; modelo: string; modeloRespaldo: string; timeoutMs: number }
+type OpcionesGemini = { clave: string; modelo: string; modelosRespaldo: string[]; timeoutMs: number }
 
 /** Convierte un mensaje del historial neutro en un "Content" de Gemini. */
 function aContenido(m: Mensaje): Content {
@@ -53,10 +53,10 @@ export class ProveedorGemini implements ProveedorLLM {
     this.ia = new GoogleGenAI({ apiKey: opciones.clave })
   }
 
-  /** Intenta con el modelo principal; si está saturado o sin cupo, prueba una vez con el de respaldo. */
+  /** Intenta con el modelo principal; si está saturado, sin cupo o lento, prueba los de respaldo en orden. */
   async enviar(sistema: string, mensajes: Mensaje[], herramientas: DefinicionHerramienta[]): Promise<Resultado<RespuestaModelo>> {
     if (!this.opciones.clave) return fallo("Falta la clave del modelo (GEMINI_API_KEY) en el servidor.")
-    const modelos = [this.opciones.modelo, this.opciones.modeloRespaldo].filter((m) => m)
+    const modelos = [this.opciones.modelo, ...this.opciones.modelosRespaldo]
     let ultimoError = ""
     for (const modelo of modelos) {
       try {
@@ -65,7 +65,8 @@ export class ProveedorGemini implements ProveedorLLM {
         const { texto, reintentable } = mensajeClaro(e)
         ultimoError = texto
         // Queda en los logs del servidor (Render) para diagnosticar; nunca incluye la clave.
-        console.warn(`[llm] ${modelo} falló: ${texto}${reintentable ? " · se prueba el siguiente modelo" : ""}`)
+        const codigo = e instanceof ApiError ? ` (HTTP ${e.status})` : ""
+        console.warn(`[llm] ${modelo} falló${codigo}: ${texto}${reintentable ? " · se prueba el siguiente modelo" : ""}`)
         if (!reintentable) break
       }
     }

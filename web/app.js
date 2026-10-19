@@ -308,8 +308,14 @@ document.getElementById("nueva").addEventListener("click", () => {
   location.reload()
 })
 
-// En pantallas chicas el panel empieza plegado para dejar lugar al chat.
-document.getElementById("panel-detalles").open = window.innerWidth > 900
+// En pantallas chicas el panel empieza plegado para dejar lugar al chat. En pantallas
+// grandes no se puede plegar, así que se abre siempre (también si la ventana se agranda).
+const detallesPanel = document.getElementById("panel-detalles")
+const pantallaGrande = window.matchMedia("(min-width: 901px)")
+detallesPanel.open = pantallaGrande.matches
+pantallaGrande.addEventListener("change", () => {
+  if (pantallaGrande.matches) detallesPanel.open = true
+})
 
 mostrarModelo()
 restaurarHistorial()
