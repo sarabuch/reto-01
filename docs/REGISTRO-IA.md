@@ -11,7 +11,7 @@ Base para la sección 9 de `SOLUCION.md`: qué propuso la IA y qué decidió Sar
 | 2026-10-19 | Escribir el log en `out/log.jsonl` (CA4) y en `out/<caso>/log.jsonl` (RN5). | Aprobado. |
 | 2026-10-19 | Copiar los soportes vencidos al paquete, marcados como vencidos en la checklist. | Aprobado. |
 | 2026-10-19 | Orden de prioridad: P0, después P1 y P2, y el bonus `modulo/` solo si sobra tiempo. | Aprobado. |
-| 2026-10-19 | Renombrar `docs/PRD.md.md` a `docs/PRD.md`. | Sin respuesta todavía. No se tocó; el `.gitignore` cubre los dos nombres. |
+| 2026-10-19 | Renombrar `docs/PRD.md.md` a `docs/PRD.md`. | Aprobado: se renombró. |
 | 2026-10-19 | — | Sara María indicó el repositorio remoto: github.com/sarabuch/reto-01. |
 | 2026-10-19 | `proveedor_generar_formulario` recalcula los valores desde el maestro y descarta los que mande el modelo (CA2). | Pendiente de revisión. |
 | 2026-10-19 | Si la plantilla está dañada, `armar_paquete` revisa igual los soportes y bloquea la firma (HU-5). | Pendiente de revisión. |
