@@ -64,6 +64,8 @@ export class ProveedorGemini implements ProveedorLLM {
       } catch (e) {
         const { texto, reintentable } = mensajeClaro(e)
         ultimoError = texto
+        // Queda en los logs del servidor (Render) para diagnosticar; nunca incluye la clave.
+        console.warn(`[llm] ${modelo} falló: ${texto}${reintentable ? " · se prueba el siguiente modelo" : ""}`)
         if (!reintentable) break
       }
     }

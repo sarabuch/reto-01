@@ -19,8 +19,8 @@ export const config = {
   maxIteraciones: numero("MAX_ITERACIONES", 25),
   /** PRD 8 (costo): tope de tokens por sesión, para que nadie gaste la clave sin límite. */
   maxTokensSesion: numero("MAX_TOKENS_SESION", 300_000),
-  /** PRD 8 (robustez): tiempo máximo de espera al proveedor LLM. */
-  timeoutLLMms: numero("LLM_TIMEOUT_MS", 60_000),
+  /** PRD 8 (robustez): tiempo máximo de espera por llamada al modelo. Una llamada normal tarda 1–10 s; si se pasa, se prueba el respaldo. */
+  timeoutLLMms: numero("LLM_TIMEOUT_MS", 30_000),
   /** Máximo de sesiones en memoria (evita que el servidor se llene). */
   maxSesiones: numero("MAX_SESIONES", 200),
   /** PRD 8 (costo): tope de tokens por día para todo el servidor (el link es público y se pueden abrir muchas sesiones). */
