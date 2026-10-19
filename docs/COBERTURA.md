@@ -88,4 +88,5 @@ Link: https://reto-01-proveedor-i2ej.onrender.com/
 | CA5 en el link: errores del proveedor claros y la sesión sigue viva | Cumple | con Google saturado se mostró "El modelo de Google está saturado…" y el siguiente mensaje funcionó |
 | Front desplegado: dos columnas, panel con datos reales, confirmación con botones | Cumple | navegador en el link (incluye el arreglo del panel al agrandar la ventana) |
 | Latencia estable | Parcial | depende del plan gratuito de Gemini: el mismo turno tardó de 23 s a 74 s y a veces falló por saturación |
-| Uso exclusivo de la marca de confirmación para la pregunta de envío | No cumple | el modelo usó la marca en "¿Hay algún otro caso?"; ajuste del prompt propuesto a Sara María |
+| Uso exclusivo de la marca de confirmación para la pregunta de envío | Cumple | tras el ajuste del prompt (aprobado por Sara María): en Render, las preguntas de cierre de los turnos 1 y 3 salieron sin la marca y solo la pregunta de envío la usó |
+| Riesgo observado: un reinicio de Render entre dos mensajes borra la sesión en memoria | Conocido | en una prueba, el despliegue entró entre el turno 1 y el 2: el agente perdió el contexto y pidió el caso de nuevo. Mitigación: no hacer push durante la defensa |
