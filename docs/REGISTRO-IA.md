@@ -13,7 +13,13 @@ Base para la sección 9 de `SOLUCION.md`: qué propuso la IA y qué decidió Sar
 | 2026-10-19 | Orden de prioridad: P0, después P1 y P2, y el bonus `modulo/` solo si sobra tiempo. | Aprobado. |
 | 2026-10-19 | Renombrar `docs/PRD.md.md` a `docs/PRD.md`. | Aprobado: se renombró. |
 | 2026-10-19 | — | Sara María indicó el repositorio remoto: github.com/sarabuch/reto-01. |
-| 2026-10-19 | `proveedor_generar_formulario` recalcula los valores desde el maestro y descarta los que mande el modelo (CA2). | Pendiente de revisión. |
-| 2026-10-19 | Si la plantilla está dañada, `armar_paquete` revisa igual los soportes y bloquea la firma (HU-5). | Pendiente de revisión. |
-| 2026-10-19 | Permitir el envío simulado aunque el paquete no esté listo, con un aviso de bloqueos en `ENVIO-SIMULADO.md` (el PRD lo pide para `ec-corp-andina`, que no queda listo). | Pendiente de revisión. |
-| 2026-10-19 | Agregar una "nota interna" al inicio del borrador de correo cuando el paquete no está listo. | Pendiente de revisión. |
+| 2026-10-19 | `proveedor_generar_formulario` recalcula los valores desde el maestro y descarta los que mande el modelo (CA2). | Aprobado. |
+| 2026-10-19 | Si la plantilla está dañada, `armar_paquete` revisa igual los soportes y bloquea la firma (HU-5). | Aprobado. |
+| 2026-10-19 | Permitir el envío simulado aunque el paquete no esté listo, con un aviso de bloqueos en `ENVIO-SIMULADO.md` (el PRD lo pide para `ec-corp-andina`, que no queda listo). | Aprobado. |
+| 2026-10-19 | Agregar una "nota interna" al inicio del borrador de correo cuando el paquete no está listo. | Aprobado. |
+| 2026-10-19 | Separar el comportamiento (`agent/prompt.md`) del conocimiento (`src/knowledge/`), con la columna "Quién lo actualiza" agregada por la IA. | Aprobado tal cual. |
+| 2026-10-19 | Modelo principal `gemini-3.5-flash-lite` y respaldo automático `gemini-3.8-flash`. Se cambió la idea inicial (3.8 como principal) porque en la prueba real 3.8 devolvió 503 (saturado) tres veces seguidas. | Pendiente de revisión. |
+| 2026-10-19 | Doble control del envío: además del prompt, el servidor bloquea `simular_envio` si el turno anterior no fue la pregunta de confirmación. En la prueba real el modelo intentó enviar sin preguntar y el bloqueo actuó. | Aprobado (Sara María lo había aprobado como parte del borrador del prompt). |
+| 2026-10-19 | En el panel del chat, el `mapeo` se muestra como cantidades, no como valores, para no exhibir datos bancarios. | Pendiente de revisión. |
+| 2026-10-19 | `ENVIO-SIMULADO.md` no lista `checklist.md` ni `borrador-correo.md` como adjuntos (son internos). | Pendiente de revisión. |
+| 2026-10-19 | No ejecutar los scripts de instalación de dependencias que Bun bloqueó (no hacen falta). | Pendiente de revisión. |

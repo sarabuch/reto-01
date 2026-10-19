@@ -27,3 +27,23 @@ Lista acumulada de criterios del PRD revisados al cerrar cada bloque. Es la base
 | PRD 6.6: `demo.ts` corre sin clave | Cumple | `bun run demo.ts` |
 | PRD 8: determinismo; `out/` se limpia al inicio | Cumple | dos ejecuciones con salida idéntica |
 | PRD 8: las herramientas no ejecutan comandos de shell | Cumple | revisión del código |
+
+## Bloque 3: agente, prompt y servidor (2026-10-19)
+
+| Criterio | Estado | Prueba |
+|---|---|---|
+| Clave "AQ." compatible con el SDK oficial (`@google/genai` 2.30.0) | Cumple | `scripts/probar-clave.ts`: `gemini-3.5-flash-lite` responde y llama a la herramienta |
+| PRD 6.1: adaptador propio; cambiar de proveedor no toca el ciclo | Cumple | `tests/ciclo.test.ts` usa un proveedor falso con el mismo ciclo |
+| PRD 6.1: system prompt en Markdown aparte | Cumple | `agent/prompt.md` + `src/knowledge/registro-proveedor.md` |
+| CA1: tope de iteraciones; al llegar, responde con lo que tiene y lo que falta | Cumple | test "CA1" |
+| CA2: solo valores que salen de herramientas | Cumple | prompt "Regla de oro" + recálculo en `generar_formulario` |
+| CA3 / RN4: confirmación explícita en el turno anterior | Cumple | test "RN4 + CA3"; prueba real: el modelo intentó enviar ante "envía" y el servidor lo bloqueó |
+| CA4: tool calls visibles (nombre, argumentos, resumen) y en `out/log.jsonl` | Cumple | respuesta de `/api/chat`; `out/log.jsonl` |
+| CA5: error del proveedor en lenguaje claro, la sesión sigue | Cumple | test "CA5"; 503 traducido a "el modelo está saturado" |
+| PRD 6.4: `POST /api/chat`, `GET /api/sessions/:id`, `GET /api/health` sin claves | Cumple | `curl` a las tres rutas |
+| PRD 8: topes de iteraciones y de tokens configurables | Cumple | `MAX_ITERACIONES`, `MAX_TOKENS_SESION` |
+| PRD 8: timeout al proveedor con mensaje claro | Parcial | programado (`LLM_TIMEOUT_MS` + `mensajeClaro`), pero no forzado en una prueba real |
+| PRD 8: clave nunca en front, repo, logs ni respuestas | Cumple | búsqueda de la clave en `out/`, respuestas, `src/`, `agent/`, `docs/`: sin coincidencias |
+| PRD 11, primer mensaje: resumen estructurado, tool calls, ruta, faltantes, estado y pregunta de cierre | Cumple | prueba real con `ec-corp-andina` (≈19.000 tokens, ≈6 s) |
+| PRD 11: "envía" genera `ENVIO-SIMULADO.md` solo tras confirmación explícita | Cumple | prueba real: "envía" → pregunta; "Sí, confirmo" → archivo |
+| Front que resalta la confirmación | Pendiente | Bloque 4 (la API ya devuelve `needsConfirmation`) |

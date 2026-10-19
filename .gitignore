@@ -5,6 +5,9 @@
 node_modules/
 out/
 
+# Configuración local de Claude Code (vista previa del servidor)
+.claude/
+
 # Archivos de trabajo locales (no van al repo público)
 CLAUDE.md
 docs/PRD.md

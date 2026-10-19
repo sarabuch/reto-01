@@ -12,6 +12,14 @@ Explicación en lenguaje simple de qué hace cada parte del proyecto. Se actuali
 - **zod:** librería que revisa que los datos tengan la forma esperada antes de usarlos (por ejemplo, que `caso` sea un texto).
 - **JSON:** formato de texto para datos estructurados, del tipo `{ "clave": "valor" }`.
 - **Log:** registro de actividad. Cada vez que se ejecuta una herramienta se agrega una línea.
+- **Modelo / LLM:** el modelo de lenguaje (Gemini), que entiende el pedido y decide qué herramientas llamar.
+- **System prompt:** las instrucciones fijas que lee el modelo en cada conversación (`agent/prompt.md`).
+- **Function calling:** la capacidad del modelo de responder "ejecutá tal herramienta con estos datos" en vez de texto.
+- **Adaptador:** una pieza intermedia que traduce entre nuestro formato y el de un proveedor (Google). Si cambiamos de proveedor, solo cambia el adaptador.
+- **Ciclo del agente:** la repetición modelo → herramienta → modelo hasta tener una respuesta final.
+- **Token:** unidad con la que el proveedor mide el texto (más o menos media palabra). Define el costo.
+- **API / endpoint:** las "direcciones" del servidor a las que el front le hace pedidos, como `/api/chat`.
+- **Sesión:** una conversación. Se identifica con un `sessionId` y vive en memoria.
 
 ## Carpetas y archivos
 
@@ -30,10 +38,31 @@ Explicación en lenguaje simple de qué hace cada parte del proyecto. Se actuali
 | `src/negocio/envio.ts` | Simula el envío: solo escribe `ENVIO-SIMULADO.md`. |
 | `src/negocio/fecha.ts` | La fecha "de hoy" con la que se decide si algo venció. |
 | `src/negocio/log.ts` | Escribe el registro en `out/log.jsonl` y `out/<caso>/log.jsonl`. |
+| `agent/prompt.md` | **Comportamiento** del agente: tono, flujo, cuándo pregunta, regla de oro y confirmación. |
+| `src/knowledge/registro-proveedor.md` | **Conocimiento** del proceso: identificador por país, soportes, qué bloquea la firma. Se suma al prompt. |
+| `src/agent/prompt.ts` | Junta el comportamiento y el conocimiento en un solo system prompt. |
+| `src/agent/ciclo.ts` | El ciclo del agente: llama al modelo, ejecuta herramientas, aplica el tope de pasos y el bloqueo del envío. |
+| `src/agent/sesiones.ts` | Guarda las conversaciones en memoria, con un máximo de sesiones. |
+| `src/llm/adapter.ts` | La interfaz neutra del proveedor: `enviar(sistema, mensajes, herramientas)`. |
+| `src/llm/gemini.ts` | La implementación para Gemini: traduce mensajes, pasa a un modelo de respaldo si hay saturación y explica los errores en lenguaje claro. |
+| `src/llm/index.ts` | Elige el proveedor según `LLM_PROVIDER`. |
+| `src/config.ts` | Lee la configuración del `.env`: clave, modelo, topes de costo y tiempo de espera. |
+| `src/server.ts` | El servidor HTTP: `/api/chat`, `/api/sessions/:id`, `/api/health` y la página del chat (`web/`). |
+| `scripts/probar-clave.ts` | Prueba la clave de Gemini sin mostrarla. Comando: `bun run scripts/probar-clave.ts`. |
 | `tests/reglas.test.ts` | Pruebas chicas de las reglas críticas. Comando: `bun test`. |
+| `tests/ciclo.test.ts` | Pruebas del ciclo con un modelo falso (sin clave): tope, confirmación, errores. |
 | `out/` | Lo que genera el sistema. No va al repositorio y se borra al inicio del demo. |
 
-## Cómo viaja un pedido (hoy, sin modelo)
+## Cómo viaja un pedido desde el chat
+
+1. La analista escribe en el chat y el front hace `POST /api/chat` con `{ sessionId, message }`.
+2. `server.ts` valida el pedido, busca la sesión y llama a `ejecutarTurno` (`ciclo.ts`).
+3. El ciclo le manda al modelo (vía el adaptador) el system prompt, la conversación y la lista de herramientas.
+4. Si el modelo pide herramientas, el ciclo las ejecuta (pasos de abajo) y le devuelve los resultados. Se repite hasta que el modelo responde con texto, con un tope de 25 vueltas.
+5. Si la respuesta contiene "❓ Confirmación requerida", la sesión queda "esperando confirmación". Solo en el mensaje siguiente se permite `proveedor_simular_envio` con `confirmado: true`. Si el modelo intenta enviar antes, el servidor lo bloquea.
+6. El servidor devuelve `{ reply, toolCalls, needsConfirmation }` y el front lo muestra.
+
+## Las herramientas, paso a paso (lo mismo que hace `demo.ts` sin modelo)
 
 1. **`proveedor_leer_solicitud`** abre `solicitud.json`, la plantilla y los soportes exigidos. Devuelve el país, el cliente, el formato, los campos y los soportes, y avisa qué campos van a necesitar confirmación.
 2. **`proveedor_mapear_campos`** busca cada campo en el glosario, toma el valor del maestro y lo clasifica.
@@ -54,5 +83,9 @@ Cada paso deja una línea en el log.
 | HU-5, errores claros | `contrato.ts` → `ejecutarSeguro` y `ejecutarHerramienta`; `datos.ts` → `leerJson` |
 | RN1, identificador por país | `mapeo.ts` → `ID_TRIBUTARIO_POR_PAIS` y `revisarIdTributario` |
 | RN2, datos bancarios | `mapeo.ts` los marca como `sensible`; `paquete.ts` → `borradorCorreo` no copia ningún valor |
-| RN4, confirmación | `proveedor.ts` → `simular_envio` (el control de "turno anterior" se suma en el Bloque 3) |
-| RN5 / CA4, log | `log.ts`, llamado desde `contrato.ts` |
+| RN4 / CA3, confirmación | `proveedor.ts` → `simular_envio` exige `confirmado`; `ciclo.ts` → `ejecutarLlamada` solo lo permite si el turno anterior preguntó; `agent/prompt.md` → sección "Confirmación" |
+| RN5 / CA4, log | `log.ts`, llamado desde `contrato.ts`; las llamadas visibles en el chat, en `ciclo.ts` |
+| CA1, tope de iteraciones | `ciclo.ts` → `ejecutarTurno` y `resumenPorTope`; valor en `config.ts` |
+| CA2, solo valores de herramientas | `agent/prompt.md` → "Regla de oro"; `generar_formulario` recalcula desde el maestro |
+| CA5, errores del modelo | `gemini.ts` → `mensajeClaro`; `ciclo.ts` muestra el error y la sesión sigue |
+| PRD 8, costo | `config.ts` → `maxIteraciones` y `maxTokensSesion` |

@@ -29,7 +29,9 @@ export async function simularEnvio(raiz: string, solicitud: Solicitud, confirmad
   const estado = await leerEstadoPaquete(raiz, caso)
   if (!estado) return fallo(`Primero hay que armar el paquete del caso ${caso}.`)
 
-  const adjuntos = await readdir(rutas.paquete(raiz, caso))
+  // checklist.md y borrador-correo.md son documentos internos: no viajan como adjuntos.
+  const internos = ["checklist.md", "borrador-correo.md"]
+  const adjuntos = (await readdir(rutas.paquete(raiz, caso))).filter((a) => !internos.includes(a))
   const aviso = estado.listo_para_firma
     ? []
     : ["", "**Atención:** se envió con bloqueos pendientes:", ...estado.checklist.bloqueos.map((b) => `- ${b}`)]
