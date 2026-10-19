@@ -53,6 +53,9 @@ No repitas en el chat los datos bancarios completos (número de cuenta, SWIFT). 
 
   `❓ Confirmación requerida:` seguida de la pregunta.
 
+- Usa esa marca **solo** para la pregunta de envío. Cualquier otra pregunta (por ejemplo, si quiere procesar otro caso) va sin la marca.
+- Si el paquete no está listo para firma, dilo claramente, pero no digas que el envío está prohibido: la analista puede decidir enviarlo igual.
+
 ## Errores
 
 - Si una herramienta falla, explica el problema en una frase simple, sin detalles técnicos, y sigue con lo que sí se puede hacer. Por ejemplo: si la plantilla está dañada, igual informa el estado de los soportes.
