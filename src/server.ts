@@ -28,6 +28,17 @@ const esquemaChat = z.object({
   message: z.string().trim().min(1, "El mensaje está vacío").max(4000, "El mensaje es demasiado largo"),
 })
 
+/** PRD 8 (costo): tokens gastados hoy por todo el servidor. Se reinicia al cambiar el día (UTC). */
+const consumoDiario = { dia: "", tokens: 0 }
+function tokensDeHoy(): number {
+  const hoy = new Date().toISOString().slice(0, 10)
+  if (consumoDiario.dia !== hoy) {
+    consumoDiario.dia = hoy
+    consumoDiario.tokens = 0
+  }
+  return consumoDiario.tokens
+}
+
 function json(datos: unknown, status = 200): Response {
   return Response.json(datos, { status })
 }
@@ -43,12 +54,17 @@ async function manejarChat(req: Request): Promise<Response> {
   const pedido = esquemaChat.safeParse(cuerpo)
   if (!pedido.success) return json({ error: pedido.error.issues.map((i) => i.message).join("; ") }, 400)
 
+  if (tokensDeHoy() >= config.maxTokensDia) {
+    return json({ reply: "⚠️ Esta demo alcanzó su tope diario de uso del modelo. Vuelve a intentar mañana.", toolCalls: [], needsConfirmation: false })
+  }
   const sesion = sesiones.obtenerOCrear(pedido.data.sessionId)
   if (sesion.ocupada) return json({ error: "Todavía estoy respondiendo el mensaje anterior." }, 409)
   sesion.ocupada = true
   sesion.ultimoUso = Date.now()
+  const tokensAntes = sesion.tokensUsados
   try {
     const respuesta = await ejecutarTurno(sesion, pedido.data.message, { ...deps, ctx: { directory: RAIZ, sessionId: sesion.id } })
+    consumoDiario.tokens += sesion.tokensUsados - tokensAntes
     return json(respuesta)
   } catch (e) {
     // Red de seguridad: nunca debería pasar, pero la sesión no muere (CA5).

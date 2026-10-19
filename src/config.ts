@@ -13,7 +13,7 @@ export const config = {
   gemini: {
     clave: process.env.GEMINI_API_KEY?.trim() ?? "",
     modelo: process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash-lite",
-    modeloRespaldo: process.env.GEMINI_MODEL_RESPALDO?.trim() || "",
+    modeloRespaldo: process.env.GEMINI_MODEL_RESPALDO?.trim() || "gemini-3.8-flash",
   },
   /** CA1: tope de vueltas herramienta → modelo por turno. */
   maxIteraciones: numero("MAX_ITERACIONES", 25),
@@ -23,4 +23,6 @@ export const config = {
   timeoutLLMms: numero("LLM_TIMEOUT_MS", 60_000),
   /** Máximo de sesiones en memoria (evita que el servidor se llene). */
   maxSesiones: numero("MAX_SESIONES", 200),
+  /** PRD 8 (costo): tope de tokens por día para todo el servidor (el link es público y se pueden abrir muchas sesiones). */
+  maxTokensDia: numero("MAX_TOKENS_DIA", 2_000_000),
 }
