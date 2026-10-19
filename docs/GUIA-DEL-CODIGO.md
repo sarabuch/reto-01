@@ -47,10 +47,11 @@ Explicación en lenguaje simple de qué hace cada parte del proyecto. Se actuali
 | `src/llm/gemini.ts` | La implementación para Gemini: traduce mensajes, pasa a un modelo de respaldo si hay saturación y explica los errores en lenguaje claro. |
 | `src/llm/index.ts` | Elige el proveedor según `LLM_PROVIDER`. |
 | `src/config.ts` | Lee la configuración del `.env`: clave, modelo, topes de costo y tiempo de espera. |
-| `src/server.ts` | El servidor HTTP: `/api/chat`, `/api/sessions/:id`, `/api/health` y la página del chat (`web/`). |
-| `web/index.html` | La página del chat: encabezado con el modelo en uso, historial, campo de texto y botón de ejemplo. |
-| `web/estilos.css` | El aspecto visual, en modo claro y oscuro, adaptado a celular. La confirmación se pinta con un recuadro amarillo. |
-| `web/app.js` | La lógica del chat: envía mensajes a `/api/chat`, muestra el indicador "pensando", cada llamada a herramienta (desplegable con sus argumentos) y resalta el pedido de confirmación. Escapa todo el texto que llega del servidor para que no se interprete como código. |
+| `src/server.ts` | El servidor HTTP: `/api/chat`, `/api/sessions/:id`, `/api/health`, `/api/casos/:caso/estado` (panel lateral) y la página del chat (`web/`). |
+| `src/negocio/estado.ts` | Lee lo que realmente se generó para un caso (archivos de `out/<caso>/` y checklist guardada) para el panel lateral del chat. |
+| `web/index.html` | La página, organizada según el mockup de Sara María: encabezado con la insignia del modelo y la sesión, el chat a la izquierda y el panel "Estado del caso" a la derecha. |
+| `web/estilos.css` | El aspecto visual (verde azulado y neutros cálidos), en modo claro y oscuro. En celular, el panel pasa arriba y se puede plegar. |
+| `web/app.js` | La lógica del chat. Envía mensajes a `/api/chat` y muestra el indicador "pensando", las "llamadas a herramientas" como tarjetas (nombre, argumentos y resultado) y el recuadro "Requiere tu confirmación" con dos botones. Cada botón manda un mensaje tuyo, así que la confirmación sigue siendo explícita (RN4). Después de cada respuesta, pide `/api/casos/<caso>/estado` para el panel. Escapa todo el texto que llega del servidor. |
 | `scripts/probar-clave.ts` | Prueba la clave de Gemini sin mostrarla. Comando: `bun run scripts/probar-clave.ts`. |
 | `tests/reglas.test.ts` | Pruebas chicas de las reglas críticas. Comando: `bun test`. |
 | `tests/ciclo.test.ts` | Pruebas del ciclo con un modelo falso (sin clave): tope, confirmación, errores. |

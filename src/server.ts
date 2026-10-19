@@ -7,6 +7,7 @@ import { cargarSystemPrompt } from "./agent/prompt"
 import { AlmacenSesiones } from "./agent/sesiones"
 import { config } from "./config"
 import { crearProveedor } from "./llm"
+import { estadoDelCaso } from "./negocio/estado"
 import { mensajeDeError } from "./tools/contrato"
 
 const RAIZ = join(import.meta.dir, "..")
@@ -66,6 +67,12 @@ function manejarSesion(id: string): Response {
     : json({ error: "Sesión no encontrada" }, 404)
 }
 
+/** GET /api/casos/:caso/estado → archivos generados y checklist, para el panel lateral del chat. */
+async function manejarEstadoCaso(caso: string): Promise<Response> {
+  const r = await estadoDelCaso(RAIZ, caso)
+  return r.ok ? json(r.data) : json({ error: r.error }, 400)
+}
+
 /** Sirve archivos de web/ sin permitir salir de esa carpeta. */
 async function servirEstatico(ruta: string): Promise<Response> {
   const relativa = ruta === "/" ? "index.html" : ruta.slice(1)
@@ -86,6 +93,8 @@ const servidor = Bun.serve({
     if (url.pathname === "/api/chat" && req.method === "POST") return manejarChat(req)
     const sesion = url.pathname.match(/^\/api\/sessions\/([A-Za-z0-9-]+)$/)
     if (sesion?.[1] && req.method === "GET") return manejarSesion(sesion[1])
+    const caso = url.pathname.match(/^\/api\/casos\/([a-z0-9-]+)\/estado$/)
+    if (caso?.[1] && req.method === "GET") return manejarEstadoCaso(caso[1])
     if (url.pathname.startsWith("/api/")) return json({ error: "Ruta no encontrada" }, 404)
     return servirEstatico(url.pathname)
   },

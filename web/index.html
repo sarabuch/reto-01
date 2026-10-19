@@ -9,28 +9,54 @@
 <body>
   <header>
     <div>
-      <h1>Registro como Proveedor</h1>
-      <p class="sub">Agente de Periferia IT Group · <span id="modelo">conectando…</span></p>
+      <h1>Agente de Registro como Proveedor</h1>
+      <p class="sub">Periferia IT Group · Perxia 2.0</p>
     </div>
-    <button id="nueva" type="button">Nueva sesión</button>
+    <div class="acciones">
+      <span id="insignia" class="insignia">conectando…</span>
+      <button id="nueva" type="button">Nueva sesión</button>
+    </div>
   </header>
 
-  <main id="chat" aria-live="polite">
-    <div class="bienvenida" id="bienvenida">
-      <p>Hola. Puedo procesar solicitudes de registro como proveedor: lleno el formulario desde el repositorio maestro y armo el paquete para firma. Nunca envío nada sin tu confirmación.</p>
-      <p>Casos disponibles: <code>co-industrias-delta</code>, <code>ec-corp-andina</code>, <code>hn-agroexport-sula</code>, <code>pa-logistica-istmo</code>.</p>
-      <button type="button" class="sugerencia" data-texto='Procesa el caso "ec-corp-andina". Dime qué campos quedaron llenos, cuáles faltan, si el paquete está listo para firma y qué soportes debo actualizar. No envíes nada todavía.'>
-        Probar: procesar ec-corp-andina
-      </button>
-    </div>
-  </main>
+  <div class="layout">
+    <section class="columna-chat" aria-label="Conversación">
+      <main id="chat" aria-live="polite">
+        <div class="bienvenida" id="bienvenida">
+          <p>Hola. Proceso solicitudes de registro como proveedor: lleno el formulario desde el repositorio maestro y armo el paquete para firma. Nunca envío nada sin tu confirmación.</p>
+          <p>Casos disponibles: <code>co-industrias-delta</code>, <code>ec-corp-andina</code>, <code>hn-agroexport-sula</code>, <code>pa-logistica-istmo</code>.</p>
+          <button type="button" class="sugerencia" data-texto='Procesa el caso "ec-corp-andina". Dime qué campos quedaron llenos, cuáles faltan, si el paquete está listo para firma y qué soportes debo actualizar. No envíes nada todavía.'>
+            Probar: procesar ec-corp-andina
+          </button>
+        </div>
+      </main>
 
-  <div id="pensando" hidden>El agente está pensando…</div>
+      <div id="pensando" hidden>El agente está pensando…</div>
 
-  <form id="formulario">
-    <textarea id="mensaje" rows="2" placeholder="Escribe un mensaje… (Enter para enviar, Shift+Enter para nueva línea)" required></textarea>
-    <button id="enviar" type="submit">Enviar</button>
-  </form>
+      <form id="formulario">
+        <label for="mensaje" class="oculto">Mensaje</label>
+        <textarea id="mensaje" rows="1" placeholder="Escribe tu mensaje al agente" required></textarea>
+        <button id="enviar" type="submit">Enviar</button>
+      </form>
+    </section>
+
+    <aside class="panel" aria-label="Estado del caso">
+      <details id="panel-detalles" open>
+        <summary>Estado del caso</summary>
+        <div class="panel-contenido">
+          <div class="tarjeta">
+            <h2>Carpeta generada</h2>
+            <div id="carpeta" class="arbol">Todavía no se procesó ningún caso.</div>
+          </div>
+          <div class="tarjeta">
+            <h2>Checklist de soportes <span id="listo" class="estado-paquete" hidden></span></h2>
+            <div id="soportes">El paquete todavía no se armó.</div>
+            <p class="nota">Un soporte vencido o ausente bloquea "listo para firma". Un campo faltante no bloquea.</p>
+          </div>
+          <div class="regla">Regla clave: las herramientas son la única fuente de valores. El agente prepara; la persona firma y decide el envío.</div>
+        </div>
+      </details>
+    </aside>
+  </div>
 
   <script src="app.js"></script>
 </body>

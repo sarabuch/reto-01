@@ -1,37 +1,53 @@
-/* Estilos del chat: simples, legibles, en modo claro y oscuro. */
+/* Estilos del chat, según el mockup de Sara María: chat a la izquierda y panel del caso a la derecha. */
 :root {
-  --fondo: #f6f7f9;
+  --fondo: #f6f5f1;
   --tarjeta: #ffffff;
-  --texto: #1d2330;
-  --suave: #5b6475;
-  --borde: #dde1e7;
-  --acento: #2f5bd3;
-  --usuario: #e8eefc;
-  --ok: #1f7a3d;
-  --error: #b42318;
-  --confirmar-fondo: #fff6d6;
-  --confirmar-borde: #e0a800;
+  --texto: #1d2433;
+  --suave: #4b5565;
+  --borde: #d9d6cb;
+  --borde-fuerte: #9aa1ad;
+  --acento: #0f5f59;
+  --acento-texto: #ffffff;
+  --usuario-fondo: #1d2433;
+  --usuario-texto: #ffffff;
+  --agente-fondo: #f1f0ea;
+  --tool-fondo: #faf9f5;
+  --insignia: #e6e4dc;
+  --presente: #14532d;
+  --vencido: #7c3a06;
+  --ausente: #991b1b;
+  --confirmar-fondo: #fef3c7;
+  --confirmar-borde: #b45309;
+  --confirmar-texto: #7c3a06;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --fondo: #12151b;
-    --tarjeta: #1b2029;
-    --texto: #e6e9ef;
-    --suave: #9aa3b2;
-    --borde: #2c3340;
-    --acento: #7a9cff;
-    --usuario: #22304d;
-    --ok: #5fcf85;
-    --error: #ff8a80;
-    --confirmar-fondo: #3a3110;
-    --confirmar-borde: #e0b400;
+    --fondo: #14171d;
+    --tarjeta: #1c2029;
+    --texto: #e7e9ee;
+    --suave: #a3abb8;
+    --borde: #313744;
+    --borde-fuerte: #4a5262;
+    --acento: #4fb3a9;
+    --acento-texto: #0b1f1d;
+    --usuario-fondo: #2c3a55;
+    --usuario-texto: #ffffff;
+    --agente-fondo: #232833;
+    --tool-fondo: #191d25;
+    --insignia: #2a2f3a;
+    --presente: #6fd49a;
+    --vencido: #f2b366;
+    --ausente: #ff9a8f;
+    --confirmar-fondo: #3b2f12;
+    --confirmar-borde: #e0a43a;
+    --confirmar-texto: #f6d58e;
   }
 }
 
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  font: 15px/1.45 "Segoe UI", system-ui, -apple-system, sans-serif;
   background: var(--fondo);
   color: var(--texto);
   display: flex;
@@ -39,117 +55,179 @@ body {
   height: 100vh;
   height: 100dvh; /* en celulares, se ajusta cuando aparece el teclado */
 }
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--borde);
-  background: var(--tarjeta);
-}
-h1 { font-size: 18px; margin: 0; }
-.sub { margin: 0; color: var(--suave); font-size: 13px; }
+.oculto { position: absolute; left: -9999px; }
 button {
   font: inherit;
+  min-height: 40px;
+  padding: 0 16px;
   border: 1px solid var(--borde);
   background: var(--tarjeta);
   color: var(--texto);
   border-radius: 8px;
-  padding: 8px 14px;
+  font-weight: 600;
   cursor: pointer;
 }
-button:disabled { opacity: 0.5; cursor: wait; }
+button:disabled { opacity: 0.5; cursor: default; }
+code { font: 13px Consolas, ui-monospace, monospace; background: var(--insignia); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
 
+/* ---------- Encabezado ---------- */
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 24px;
+}
+h1 { font-size: 22px; margin: 0; }
+.sub { margin: 0; font-size: 13px; color: var(--suave); }
+.acciones { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.insignia { font: 12px Consolas, ui-monospace, monospace; padding: 6px 10px; background: var(--insignia); border-radius: 6px; }
+
+/* ---------- Dos columnas ---------- */
+.layout {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 20px;
+  padding: 0 24px 20px;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+}
+.columna-chat {
+  flex: 1 1 560px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+}
+.panel { flex: 0 1 340px; min-width: 0; overflow-y: auto; }
+#panel-detalles > summary { display: none; }
+.panel-contenido { display: flex; flex-direction: column; gap: 16px; }
+
+/* ---------- Conversación ---------- */
 main {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-width: 900px;
-  width: 100%;
-  margin: 0 auto;
+  gap: 14px;
 }
-.bienvenida, .mensaje {
-  background: var(--tarjeta);
-  border: 1px solid var(--borde);
-  border-radius: 10px;
+.bienvenida p { margin: 0 0 10px; }
+.sugerencia { border-color: var(--acento); color: var(--acento); }
+.burbuja-usuario {
+  align-self: flex-end;
+  max-width: 85%;
+  background: var(--usuario-fondo);
+  color: var(--usuario-texto);
   padding: 12px 14px;
+  border-radius: 12px 12px 2px 12px;
+  white-space: pre-wrap;
 }
-.mensaje.usuario { background: var(--usuario); align-self: flex-end; max-width: 85%; white-space: pre-wrap; }
-.mensaje.agente { align-self: stretch; }
-.mensaje.error { border-color: var(--error); }
-.mensaje p { margin: 0 0 8px; }
-.mensaje p:last-child { margin-bottom: 0; }
-.mensaje p.item { margin: 0 0 4px; display: flex; gap: 6px; }
-.mensaje p.item .marca { flex: none; min-width: 1.2em; color: var(--suave); }
-.mensaje p.nivel-1 { padding-left: 20px; }
-.mensaje p.nivel-2 { padding-left: 40px; }
-.mensaje p.nivel-3 { padding-left: 60px; }
-code { font-size: 13px; background: var(--fondo); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
-.sugerencia { margin-top: 4px; border-color: var(--acento); color: var(--acento); }
+.turno-agente { display: flex; flex-direction: column; gap: 10px; }
+.turno-agente.error .burbuja-agente { border: 1px solid var(--ausente); }
+.rotulo { font-size: 12px; font-weight: 700; color: var(--suave); letter-spacing: 0.04em; }
+.burbuja-agente {
+  max-width: 92%;
+  background: var(--agente-fondo);
+  padding: 14px;
+  border-radius: 12px 12px 12px 2px;
+}
+.burbuja-agente p { margin: 0 0 6px; }
+.burbuja-agente p:last-child { margin-bottom: 0; }
+.burbuja-agente p.item { display: flex; gap: 6px; }
+.burbuja-agente p.item .marca { flex: none; min-width: 1.2em; color: var(--suave); }
+.burbuja-agente p.nivel-1 { padding-left: 20px; }
+.burbuja-agente p.nivel-2 { padding-left: 40px; }
+.burbuja-agente p.nivel-3 { padding-left: 60px; }
 
-/* Llamadas a herramientas (CA4) */
-.herramientas { margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; }
+/* ---------- Llamadas a herramientas (CA4) ---------- */
 details.tool {
   border: 1px solid var(--borde);
   border-radius: 8px;
-  background: var(--fondo);
-  font-size: 13px;
+  background: var(--tool-fondo);
 }
-details.tool summary { cursor: pointer; padding: 6px 10px; list-style-position: inside; }
-details.tool .nombre { font-family: ui-monospace, Consolas, monospace; font-weight: 600; }
-details.tool .estado-ok { color: var(--ok); }
-details.tool .estado-error { color: var(--error); }
+details.tool summary { cursor: pointer; padding: 10px 12px; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+details.tool summary::-webkit-details-marker { display: none; }
+.tool-nombre { font: 700 13px Consolas, ui-monospace, monospace; color: var(--acento); }
+.tool-args { font: 12px Consolas, ui-monospace, monospace; color: var(--suave); overflow-wrap: anywhere; }
+.tool-resultado { font-size: 13px; }
+.tool-resultado.fallo { color: var(--ausente); }
 details.tool pre {
   margin: 0;
-  padding: 8px 10px;
+  padding: 8px 12px;
   border-top: 1px solid var(--borde);
+  font-size: 12px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font-size: 12px;
 }
 
-/* Pedido de confirmación resaltado (CA3) */
+/* ---------- Confirmación (CA3) ---------- */
 .confirmacion {
-  margin-top: 10px;
-  padding: 10px 12px;
   border: 2px solid var(--confirmar-borde);
   background: var(--confirmar-fondo);
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
+.confirmacion .rotulo { color: var(--confirmar-texto); }
+.confirmacion .aclaracion { font-size: 13px; color: var(--confirmar-texto); }
+.confirmacion .botones { display: flex; gap: 10px; flex-wrap: wrap; }
+.confirmacion button { min-height: 44px; }
+.boton-principal { background: var(--acento); color: var(--acento-texto); border-color: var(--acento); }
+.boton-secundario { border-color: var(--confirmar-texto); color: var(--confirmar-texto); }
 
-#pensando {
-  max-width: 900px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 16px 8px;
-  color: var(--suave);
-  font-style: italic;
-}
+/* ---------- Entrada ---------- */
+#pensando { padding: 0 20px 8px; color: var(--suave); font-style: italic; }
 form {
   display: flex;
-  gap: 8px;
-  padding: 12px 16px;
+  gap: 10px;
+  padding: 14px 20px;
   border-top: 1px solid var(--borde);
-  background: var(--tarjeta);
 }
 textarea {
   flex: 1;
   font: inherit;
+  min-height: 44px;
   resize: vertical;
-  padding: 8px 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--borde-fuerte);
   border-radius: 8px;
-  border: 1px solid var(--borde);
-  background: var(--fondo);
+  background: var(--tarjeta);
   color: var(--texto);
 }
-#enviar { background: var(--acento); color: #fff; border-color: var(--acento); }
+#enviar { min-height: 44px; background: var(--usuario-fondo); color: var(--usuario-texto); border-color: var(--usuario-fondo); }
 
-@media (max-width: 600px) {
-  .mensaje.usuario { max-width: 100%; }
-  header { padding: 10px 12px; }
+/* ---------- Panel del caso ---------- */
+.tarjeta { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 12px; padding: 18px; }
+.tarjeta h2 { font-size: 15px; margin: 0 0 10px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.arbol { font: 13px/1.7 Consolas, ui-monospace, monospace; white-space: pre; overflow-x: auto; }
+.fila-soporte { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; }
+.fila-soporte .presente { font-weight: 700; color: var(--presente); }
+.fila-soporte .vencido { font-weight: 700; color: var(--vencido); }
+.fila-soporte .ausente { font-weight: 700; color: var(--ausente); }
+.estado-paquete { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--insignia); }
+.estado-paquete.listo { color: var(--presente); }
+.estado-paquete.no-listo { color: var(--ausente); }
+.nota { font-size: 12px; color: var(--suave); margin: 10px 0 0; }
+.regla { background: var(--insignia); border-radius: 12px; padding: 14px; font-size: 13px; }
+
+/* ---------- Celular: el panel pasa arriba y se puede plegar ---------- */
+@media (max-width: 900px) {
+  header { padding: 10px 16px; gap: 8px; }
+  h1 { font-size: 17px; }
+  .insignia { font-size: 11px; padding: 4px 8px; }
+  .acciones button { min-height: 32px; padding: 0 10px; font-size: 13px; }
+  .layout { flex-direction: column-reverse; padding: 0 16px 16px; gap: 12px; }
+  .columna-chat { flex: 1 1 auto; min-height: 0; }
+  .panel { flex: none; max-height: 45vh; }
+  #panel-detalles > summary { display: block; cursor: pointer; font-weight: 700; padding: 10px 14px; background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 12px; }
+  #panel-detalles[open] > summary { margin-bottom: 12px; }
+  .burbuja-usuario, .burbuja-agente { max-width: 100%; }
 }

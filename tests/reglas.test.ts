@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
+import { estadoDelCaso } from "../src/negocio/estado"
 import { mapearCampos } from "../src/negocio/mapeo"
 import { calcularBloqueos, evaluarSoportes } from "../src/negocio/paquete"
 import { ejecutarHerramienta, type Contexto, type Resultado } from "../src/tools/contrato"
@@ -86,6 +87,16 @@ describe("Paquete y envío", () => {
     await llamar("proveedor_armar_paquete", { caso: "ec-corp-andina" })
     const r = await llamar<{ ruta: string }>("proveedor_simular_envio", { caso: "ec-corp-andina", confirmado: true })
     expect(r.ok && r.data.ruta).toBe("out/ec-corp-andina/ENVIO-SIMULADO.md")
+  })
+})
+
+describe("Panel del caso", () => {
+  test("muestra lo generado en disco y rechaza nombres peligrosos", async () => {
+    await llamar("proveedor_armar_paquete", { caso: "hn-agroexport-sula" })
+    const r = await estadoDelCaso(ctx.directory, "hn-agroexport-sula")
+    expect(r.ok && r.data.archivos).toContain("paquete/checklist.md")
+    expect(r.ok && r.data.paquete?.listo_para_firma).toBe(false)
+    expect((await estadoDelCaso(ctx.directory, "../../etc")).ok).toBe(false)
   })
 })
 

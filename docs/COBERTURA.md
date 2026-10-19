@@ -61,3 +61,13 @@ Lista acumulada de criterios del PRD revisados al cerrar cada bloque. Es la base
 | Uso en celular sin desplazamiento horizontal | Cumple | vista de 375 px: ancho de página = ancho de ventana |
 | Seguridad: el texto del servidor no se interpreta como HTML | Cumple | código (`escapar` antes de dar formato) |
 | PRD 8: un comando levanta front y backend | Cumple | `bun run dev` sirve `web/` y la API en el mismo puerto |
+
+### Bloque 4 (revisión): reorganización según el mockup de Sara María
+
+| Criterio | Estado | Prueba |
+|---|---|---|
+| Chat y panel "Estado del caso" en dos columnas; en celular el panel pasa arriba y se pliega | Cumple | navegador a 1280 px y a 375 px (sin desplazamiento horizontal) |
+| CA2: el panel muestra solo datos reales (archivos de `out/<caso>/` y checklist guardada), no lo que dice el modelo | Cumple | `GET /api/casos/ec-corp-andina/estado`; test "Panel del caso" |
+| CA4: rótulo "LLAMADAS A HERRAMIENTAS"; cada tarjeta con nombre, argumentos y resultado | Cumple | navegador |
+| CA3 / RN4: recuadro "Requiere tu confirmación" con botones que mandan un mensaje explícito; se desactivan al mandar otro | Cumple | navegador: "Confirmar envío simulado" → `ENVIO-SIMULADO.md` aparece en el panel |
+| Seguridad: la ruta nueva rechaza nombres de caso peligrosos | Cumple | `curl` con `..%2F` y test "Panel del caso" |

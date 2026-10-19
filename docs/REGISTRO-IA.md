@@ -26,4 +26,6 @@ Base para la sección 9 de `SOLUCION.md`: qué propuso la IA y qué decidió Sar
 | 2026-10-19 | Front en HTML, CSS y JavaScript planos, sin frameworks, servido por el mismo servidor Bun (un solo comando y un solo servicio en Render). | Aprobado en el plan ("lo más simple que cumpla el PRD"). |
 | 2026-10-19 | Botón de ejemplo con el prompt de la sección 11 y la lista de casos disponibles en la bienvenida. | Pendiente de revisión. |
 | 2026-10-19 | Guardar el id de sesión en el navegador (sessionStorage) para recuperar el historial al recargar. | Pendiente de revisión. |
-| 2026-10-19 | Mostrar las llamadas a herramientas como desplegables: el resumen siempre visible y los argumentos al hacer clic. | Pendiente de revisión. |
+| 2026-10-19 | Mostrar las llamadas a herramientas como desplegables: el resumen siempre visible y los argumentos al hacer clic. | Reemplazado por el diseño del mockup de Sara María (tarjetas con argumentos visibles). |
+| 2026-10-19 | — | Sara María diseñó un mockup del front (dos columnas con panel de carpeta y checklist, tarjetas de herramientas, recuadro de confirmación con botones) y pidió aplicarlo sin contradecir el PRD. |
+| 2026-10-19 | Aplicar el mockup con datos reales: ruta nueva `GET /api/casos/:caso/estado` para el panel; los botones de confirmación mandan un mensaje de la usuaria (no saltean la regla RN4). Se mantienen "Nueva sesión" y el ejemplo de la sección 11, que el mockup no mostraba. | Pendiente de revisión. |
