@@ -92,7 +92,7 @@ Cada paso deja una línea en el log.
 | CA1, tope de iteraciones | `ciclo.ts` → `ejecutarTurno` y `resumenPorTope`; valor en `config.ts` |
 | CA2, solo valores de herramientas | `agent/prompt.md` → "Regla de oro"; `generar_formulario` recalcula desde el maestro |
 | CA5, errores del modelo | `gemini.ts` → `mensajeClaro`; `ciclo.ts` muestra el error y la sesión sigue |
-| PRD 8, costo | `config.ts` → `maxIteraciones` y `maxTokensSesion` |
+| PRD 8, costo | Valores en `config.ts`. Tope por sesión: `ciclo.ts` → `ejecutarTurno` (corta sin otra llamada al modelo). Tope por día: `server.ts` → `tokensDeHoy` (responde sin llamar al modelo). Espera al modelo: `gemini.ts` → `enviar` (pasa al siguiente modelo) |
 
 ## Despliegue (Render)
 

@@ -12,6 +12,9 @@ export const MARCA_CONFIRMACION = "Confirmación requerida"
 
 const HERRAMIENTA_ENVIO = "proveedor_simular_envio"
 
+/** Respuesta cuando la sesión llega a MAX_TOKENS_SESION (PRD 8, costo). */
+const AVISO_TOPE_SESION = "⚠️ Esta sesión alcanzó su tope de uso del modelo. Abre una sesión nueva para continuar."
+
 export type Dependencias = {
   proveedor: ProveedorLLM
   sistema: string
@@ -87,9 +90,7 @@ export async function ejecutarTurno(sesion: Sesion, mensajeUsuario: string, deps
   sesion.esperandoConfirmacion = false
   sesion.historial.push({ rol: "usuario", texto: mensajeUsuario, ts: new Date().toISOString(), toolCalls: [], needsConfirmation: false })
 
-  if (sesion.tokensUsados >= deps.maxTokensSesion) {
-    return cerrarTurno(sesion, "Esta sesión alcanzó su tope de uso del modelo. Abre una sesión nueva para continuar.", [])
-  }
+  if (sesion.tokensUsados >= deps.maxTokensSesion) return cerrarTurno(sesion, AVISO_TOPE_SESION, [])
   sesion.mensajes.push({ rol: "usuario", texto: mensajeUsuario })
   const toolCalls: ToolCallVisible[] = []
   const definiciones = definicionesDeHerramientas()
@@ -109,7 +110,11 @@ export async function ejecutarTurno(sesion: Sesion, mensajeUsuario: string, deps
       toolCalls.push({ nombre: l.nombre, args: argsVisibles(l.args), ...resumirResultado(resultado) })
     }
     sesion.mensajes.push({ rol: "herramienta", resultados })
-    if (sesion.tokensUsados >= deps.maxTokensSesion) break
+    // PRD 8 (costo): si la sesión se pasó de su tope, se corta sin otra llamada al modelo.
+    // Lo ejecutado queda visible en toolCalls y en los archivos de out/.
+    if (sesion.tokensUsados >= deps.maxTokensSesion) {
+      return cerrarTurno(sesion, `${AVISO_TOPE_SESION} Las herramientas que alcanzaron a ejecutarse se ven arriba.`, toolCalls)
+    }
   }
   return cerrarTurno(sesion, await resumenPorTope(sesion, deps), toolCalls)
 }

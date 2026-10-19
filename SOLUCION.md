@@ -54,15 +54,20 @@ Ajustes respecto de lo planeado: **\[propio\]**
 ## 3. Ciclo del agente
 
 - **Bucle.** El backend envía al modelo el prompt, el historial y las herramientas disponibles. El modelo pide una herramienta, el backend la ejecuta y devuelve el resultado, hasta que el modelo responde en texto. **\[propio\]**
-- **Tope de iteraciones.** `[25]` por turno (valor sugerido por el PRD). Al alcanzarlo, el agente responde con lo que tiene y lo que falta. **\[PRD CA1\]**
+- **Tope de iteraciones.** 25 por turno (valor sugerido por el PRD). Al alcanzarlo, el agente responde con lo que tiene y lo que falta. **\[PRD CA1\]**
 - **Confirmación humana.** `proveedor_simular_envio` rechaza si no recibe `confirmado: true`. El agente cierra el turno con una pregunta explícita y solo avanza si el siguiente mensaje confirma. El front resalta ese estado. **\[PRD CA3, §6.2\]**
 - **Errores.** Las herramientas nunca lanzan excepciones: devuelven `{ ok, data }` o `{ ok: false, error }`, y la sesión no se cae. **\[PRD §6.2, CA5\]**
 - **Doble control del envío.** Además del prompt, el servidor (`src/agent/ciclo.ts`) rechaza `proveedor_simular_envio` con `confirmado: true` si el mensaje anterior del agente no fue la pregunta de confirmación. Ese mensaje se reconoce porque termina con la marca `❓ Confirmación requerida:`. En las pruebas reales, ante un "envía" sin pregunta previa el modelo intentó enviar varias veces y el servidor lo bloqueó siempre. **\[propio\]**
-- **Topes y timeout (valores elegidos), todos configurables por variable de entorno:** **\[propio\]**
-  - 300.000 tokens por sesión (`MAX_TOKENS_SESION`).
-  - 2.000.000 tokens por día para todo el servidor (`MAX_TOKENS_DIA`), porque el link es público y se pueden abrir muchas sesiones.
-  - 45 segundos de espera por llamada al modelo (`LLM_TIMEOUT_MS`). Primero fueron 60 s, después 30 s, y quedó en 45 s tras medir la latencia real del plan gratuito.
-  - 25 vueltas por turno (`MAX_ITERACIONES`).
+- **Topes y timeout: valores elegidos y qué pasa al superarlos.** Todos se configuran por variable de entorno. **\[propio\]**
+
+  | Tope | Valor | Qué pasa al superarlo | Dónde está | Probado |
+  | --- | --- | --- | --- | --- |
+  | Vueltas por turno (`MAX_ITERACIONES`) **\[PRD CA1\]** | 25 | Se hace una última llamada al modelo, sin herramientas, para que resuma lo que logró y lo que falta. La respuesta empieza con "⚠️ Se alcanzó el tope de pasos de este turno". | `src/agent/ciclo.ts` → `resumenPorTope` | Sí (test "CA1") |
+  | Tokens por sesión (`MAX_TOKENS_SESION`) | 300.000 | El turno se corta sin otra llamada al modelo; lo ya ejecutado queda visible y en `out/`. Desde ahí, cada mensaje de esa sesión responde "⚠️ Esta sesión alcanzó su tope de uso del modelo. Abre una sesión nueva para continuar". | `src/agent/ciclo.ts` → `ejecutarTurno` | Sí (test "PRD 8") |
+  | Tokens por día, todo el servidor (`MAX_TOKENS_DIA`) | 2.000.000 | Antes de cada mensaje se revisa el total del día: si se pasó, responde "⚠️ Esta demo alcanzó su tope diario de uso del modelo. Vuelve a intentar mañana", sin llamar al modelo. El contador vuelve a cero al cambiar el día (UTC) o al reiniciarse el servidor. | `src/server.ts` → `tokensDeHoy` | No (revisado en el código) |
+  | Espera por llamada al modelo (`LLM_TIMEOUT_MS`) | 45 s | Se corta la llamada y se prueba el siguiente modelo de la lista de respaldo. Si fallan todos, el chat muestra "⚠️ El modelo tardó demasiado en responder. Intenta de nuevo" y la sesión sigue viva. | `src/llm/gemini.ts` → `enviar` | Sí (forzado en local con 1 ms) |
+
+  El tope por día existe porque el link es público y se pueden abrir muchas sesiones. La espera primero fue de 60 s, después de 30 s, y quedó en 45 s tras medir la latencia real del plan gratuito.
 - **Visibilidad (CA4).** Cada llamada a herramienta vuelve al front con nombre, argumentos y resumen, y queda en `out/log.jsonl` y en `out/<caso>/log.jsonl`. En el chat, el mapeo enviado a `generar_formulario` se muestra como cantidades, para no exhibir datos bancarios. **\[propio\]**
 
 ## 4. Elección del modelo
@@ -91,7 +96,11 @@ Ajustes respecto de lo planeado: **\[propio\]**
 
 Para 8 a 12 registros por mes, recomiendo un enfoque asistido: el agente prepara los valores y el humano opera el portal. **\[propio\]**
 
-**Credenciales.** Nunca en el repositorio, el prompt ni los logs, y las ingresa el humano. **\[PRD §7.4\]** Viven en un gestor de secretos de la empresa. **\[propio\]**
+Como paso intermedio antes de automatizar, el agente puede generar, además de `valores-portal.md`, una lista de verificación por pantalla del portal, para que la analista confirme campo por campo lo que cargó. **\[propio\]**
+
+**Credenciales.** Nunca en el repositorio, el prompt ni los logs, y las ingresa el humano. **\[PRD §7.4\]** Viven en un gestor de secretos de la empresa (por ejemplo, el servicio de secretos de la nube que ya use Periferia). El agente nunca recibe la credencial, ni siquiera para "probar el ingreso". **\[propio\]**
+
+El propio reto muestra por qué el ingreso es humano: en `pa-logistica-istmo`, las credenciales del portal llegaron "por separado al correo del representante legal". **\[propio\]**
 
 **Reparto agente / humano.**
 
@@ -99,6 +108,7 @@ Para 8 a 12 registros por mes, recomiendo un enfoque asistido: el agente prepara
 | --- | --- |
 | Prepara `valores-portal.md`, listo para copiar **\[PRD HU-3\]** | Inicia sesión (credenciales, CAPTCHA, MFA) **\[PRD §7.4\]** |
 | Marca faltantes y dudas **\[propio\]** | Revisa lo cargado **\[propio\]** |
+| (Fase intermedia) genera una lista de verificación por pantalla **\[propio\]** | Confirma campo por campo lo que cargó **\[propio\]** |
 | (Fase futura) rellena campos en pantalla **\[propio\]** | Hace clic en "Enviar" **\[PRD §7.4\]** |
 
 **En este reto:** formato `portal` → el agente responde "formato no soportado" y genera `out/<caso>/valores-portal.md`. **\[PRD HU-3\]**
@@ -114,6 +124,11 @@ Decisiones tomadas durante el desarrollo. **\[propio\]**
 | 3 | Soporte ausente o vencido bloquea `listo_para_firma`; el envío simulado solo advierte (`ENVIO-SIMULADO.md` lista los bloqueos pendientes) | Bloquear también el envío | El **\[PRD\]** no lo define: es una decisión de producto entre advertir y ser estricta |
 | 4 | Gemini con clave gratuita | Un modelo de pago | Costo cero para construir; a cambio, límites de uso |
 | 5 | Sesiones en memoria o archivos, sin base de datos | Base de datos | Más simple; no escala. El **\[PRD §6.1\]** lo permite |
+| 6 | Doble control del envío: prompt **y** bloqueo en el servidor | Confiar solo en el prompt | En las pruebas reales el modelo intentó enviar sin preguntar; el servidor lo bloqueó siempre |
+| 7 | Mapeo exacto por glosario | Coincidencia "parecida" con un puntaje de confianza | Un parecido puede llenar un dato equivocado (por ejemplo, "Teléfono contacto comercial" con el teléfono general); es preferible un `faltante` a un error |
+| 8 | `gemini-3.5-flash-lite` con una lista de modelos de respaldo | Un solo modelo, el más capaz | El plan gratuito se satura por modelo; los respaldos mantienen viva la demo |
+| 9 | HTML plano servido por el mismo servidor | React con un build aparte | Un solo comando y un solo servicio en Render; menos piezas que explicar |
+| 10 | Panel lateral alimentado por una ruta del servidor | Mostrar en el panel lo que escribe el modelo | Solo se afirma lo que sale de una herramienta o del disco **\[PRD CA2\]** |
 
 ## 7. Supuestos
 
@@ -156,7 +171,7 @@ Además de las historias: **\[propio\]**
 | --- | --- | --- |
 | Front de chat (historial, "pensando", tool calls, confirmación resaltada) | Hecho | Autenticación si deja de ser una demo |
 | Link público (Render) | Hecho, con latencia variable por la capa gratuita de Gemini | Plan pago del modelo y de Render (sin suspensión) |
-| `demo.ts` sin modelo y 19 pruebas (`bun test`) | Hecho | Pruebas con plantillas reales |
+| `demo.ts` sin modelo y 20 pruebas (`bun test`) | Hecho | Pruebas con plantillas reales |
 | Bonus `modulo/` (sección 9.4 del PRD) | No hecho | Empaquetar `agent.md`, `tools/` y `SKILL.md` reutilizando los mismos archivos |
 
 ## 9. Uso de IA
@@ -195,20 +210,22 @@ Además de las historias: **\[propio\]**
 | Hacer una práctica previa fuera del reloj (prueba general de las herramientas y de la llamada a la API) | Propuesta de la IA, ejecutada |
 | Reescribir yo las secciones de producto de este documento | Acordado con la IA |
 | Marcar siempre el origen (PRD o propio) de lo que se incorpora | Propia |
+| Diseño del front: dos columnas, panel con carpeta y checklist, botones de confirmación | Propia (mockup hecho con Claude chat); Claude Code lo implementó **\[propio\]** |
 
 ### 9.4 Propuestas de la IA que descarté o ajusté
 
-- Comentarios línea por línea (idea mía) → reemplazados por comentarios por bloque y una guía del repositorio, a propuesta de la IA.
 - Verificación exhaustiva con suites de tests → reducida a `demo.ts` y casos de ejemplo.
 - Diseño del front de Claude Code (una columna, herramientas como desplegables) → reemplazado por **mi mockup**: dos columnas con el panel de carpeta y checklist, tarjetas de herramientas y botones de confirmación. Claude Code lo aplicó sin contradecir el PRD: el panel lee datos reales y los botones mandan un mensaje mío explícito. **\[propio\]**
 - Modelo `gemini-3.8-flash` como principal (propuesta inicial de Claude Code) → cambiado a `gemini-3.5-flash-lite` con respaldos después de probarlo con mi clave: el 3.8 estaba saturado. **\[propio\]**
 - Tiempo de espera de 30 s al modelo (propuesto tras un corte en Render) → corregido a 45 s cuando se midió que el plan gratuito tardaba hasta 40 s por consulta. **\[propio\]**
 - Prompt del agente: aprobé el borrador y después dos ajustes que Claude Code detectó en las pruebas en Render: la marca de confirmación solo para la pregunta de envío, y no decir que el envío está prohibido. **\[propio\]**
-- Las demás propuestas de Claude Code las aprobé tal cual; el detalle, con fecha, está en `docs/REGISTRO-IA.md`. Entre ellas: la fecha real con `FECHA_EJECUCION`, el mapeo exacto por glosario, el envío con advertencia, el doble control del envío en el servidor, el tope diario de tokens y no ejecutar los scripts de instalación que Bun bloqueó. **\[propio\]**
+- Las demás propuestas de Claude Code las aprobé tal cual; el detalle, con fecha, está en `docs/REGISTRO-IA.md`. Entre ellas: la fecha real con `FECHA_EJECUCION`, el mapeo exacto por glosario, el envío con advertencia, el doble control del envío en el servidor y el tope diario de tokens. **\[propio\]**
 
 ### 9.5 Cómo verifiqué
 
 Ejecuté `demo.ts` y los casos de `fixtures/` al cerrar cada bloque, revisé los criterios de las historias de usuario y probé de punta a punta el caso `ec-corp-andina` con el prompt de la sección 11 del PRD. Resultados: **\[propio\]**
+
+**En una línea:** los 4 casos corren con `demo.ts`, pasan 20 pruebas y la sección 11 funciona en el link público.
 
 - **`demo.ts`** procesa los 4 casos sin clave y da la misma salida en dos ejecuciones seguidas. Resultados por caso:
 
@@ -219,7 +236,7 @@ Ejecuté `demo.ts` y los casos de `fixtures/` al cerrar cada bloque, revisé los
   | `hn-agroexport-sula` | 9 llenos, 1 faltante, 1 a confirmar | No listo: Cámara de Comercio y parafiscales vencidos |
   | `pa-logistica-istmo` | Portal: "formato no soportado" y `valores-portal.md` | No listo: Cámara de Comercio vencida |
 
-- **`bun test`**: 19 pruebas pasan. Cubren las reglas RN1 a RN4, HU-2 y HU-5, el panel del caso y el ciclo del agente con un modelo falso (tope de pasos, bloqueo del envío y errores del proveedor).
+- **`bun test`**: 20 pruebas pasan. Cubren las reglas RN1 a RN4, HU-2 y HU-5, el panel del caso y el ciclo del agente con un modelo falso (tope de pasos, tope de tokens por sesión, bloqueo del envío y errores del proveedor).
 - **En el link de Render**, con el prompt de la sección 11:
   - Primer mensaje: 4 herramientas visibles, resumen estructurado, faltante, RUC a confirmar, "no listo para firma" y pregunta de cierre. No se envió nada.
   - "envía": el modelo intentó enviar sin preguntar y el servidor lo bloqueó; después hizo la pregunta de confirmación.
@@ -237,3 +254,9 @@ Ejecuté `demo.ts` y los casos de `fixtures/` al cerrar cada bloque, revisé los
 | Maestro desactualizado | Asignar un dueño del dato y alertar por vigencias | **\[PRD §10\]** y **\[propio\]** |
 | Soportes vencidos que pasan inadvertidos | Bloqueo de `listo_para_firma` y alerta previa al vencimiento | **\[propio\]** |
 | Límites de la capa gratuita o caída del proveedor | Adaptador intercambiable, topes de costo y mensajes claros | **\[propio\]** |
+| Plantillas reales más desordenadas | Todo lo ambiguo va a confirmación humana | **\[propio\]** |
+| Latencia y saturación de la capa gratuita del modelo (se midieron hasta 74 s por caso y fallas por saturación) | Plan pago del modelo en producción, respaldos automáticos y mensajes claros | **\[propio\]** |
+| Pérdida de la conversación si el servidor se reinicia (las sesiones viven en memoria; en Render pasó durante una prueba) | Guardar las sesiones en archivo o base de datos; no desplegar durante el uso | **\[propio\]** |
+| Uso abusivo del link público que gaste la clave | Topes por sesión y por día (ya implementados); autenticación en producción | **\[propio\]** |
+| Instrucciones escondidas en el correo del cliente (por ejemplo, "envíen ya") | El prompt trata el cuerpo del correo como dato, no como orden, y el envío exige confirmación humana | **\[propio\]** |
+| El modelo nombra un caso que no existe (pasó una vez, como ejemplo) | Las herramientas validan el nombre del caso y devuelven la lista de casos reales | **\[propio\]** |

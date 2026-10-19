@@ -88,6 +88,20 @@ describe("ciclo del agente", () => {
     expect(r.reply).toContain("tope de pasos")
   })
 
+  test("PRD 8: al superar el tope de tokens de la sesión se corta sin otra llamada al modelo", async () => {
+    const sesion = new AlmacenSesiones(5).obtenerOCrear("sesion-6")
+    let llamadasAlModelo = 0
+    const repetida = llamada("proveedor_leer_solicitud", { caso: "co-industrias-delta" })
+    const p: ProveedorLLM = { nombre: "falso", modelo: "guion", async enviar() { llamadasAlModelo++; return repetida } }
+    const conTope: Dependencias = { ...deps(p), maxTokensSesion: 15 } // cada respuesta falsa cuenta 10 tokens
+    const r1 = await ejecutarTurno(sesion, "procesa", conTope)
+    expect(r1.reply).toContain("tope de uso")
+    expect(llamadasAlModelo).toBe(2)
+    const r2 = await ejecutarTurno(sesion, "sigue", conTope)
+    expect(r2.reply).toContain("tope de uso")
+    expect(llamadasAlModelo).toBe(2)
+  })
+
   test("CA5: un error del proveedor se muestra claro y la sesión sigue funcionando", async () => {
     const sesion = new AlmacenSesiones(5).obtenerOCrear("sesion-5")
     const p = proveedorFalso([fallo("El modelo de Google está saturado"), texto("Ahora sí")])

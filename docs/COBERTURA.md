@@ -90,3 +90,11 @@ Link: https://reto-01-proveedor-i2ej.onrender.com/
 | Latencia estable | Parcial | depende del plan gratuito de Gemini: el mismo turno tardó de 23 s a 74 s y a veces falló por saturación |
 | Uso exclusivo de la marca de confirmación para la pregunta de envío | Cumple | tras el ajuste del prompt (aprobado por Sara María): en Render, las preguntas de cierre de los turnos 1 y 3 salieron sin la marca y solo la pregunta de envío la usó |
 | Riesgo observado: un reinicio de Render entre dos mensajes borra la sesión en memoria | Conocido | en una prueba, el despliegue entró entre el turno 1 y el 2: el agente perdió el contexto y pidió el caso de nuevo. Mitigación: no hacer push durante la defensa |
+
+### Bloque 6 (revisión): qué pasa al superar cada tope
+
+| Criterio | Estado | Prueba |
+|---|---|---|
+| PRD 8: al superar el tope de tokens por sesión, el turno se corta sin otra llamada al modelo y con un mensaje correcto | Cumple (corregido) | test "PRD 8: al superar el tope de tokens de la sesión…". Antes decía "tope de pasos" y hacía una llamada extra al modelo |
+| Comportamiento de cada tope documentado | Cumple | `SOLUCION.md` §3 (tabla), `README.md` ("Qué pasa al superar un tope") y `docs/GUIA-DEL-CODIGO.md` |
+| Tope diario `MAX_TOKENS_DIA` | Parcial | revisado en el código, sin prueba automática; el contador vuelve a cero si el servidor se reinicia |

@@ -85,6 +85,13 @@ Solo `GEMINI_API_KEY` es obligatoria. La clave vive únicamente en `.env` (local
 | `LLM_PROVIDER` | `gemini` | Proveedor del adaptador LLM |
 | `PORT` | `3000` | Puerto (Render lo define solo) |
 
+### Qué pasa al superar un tope
+
+- **`MAX_ITERACIONES`:** el agente hace una última llamada, sin herramientas, y responde con lo que logró y lo que falta.
+- **`MAX_TOKENS_SESION`:** el turno se corta sin otra llamada al modelo. Desde ahí la sesión pide abrir una nueva.
+- **`MAX_TOKENS_DIA`:** el servidor responde "tope diario alcanzado" sin llamar al modelo. El contador vuelve a cero al cambiar el día (UTC) o al reiniciarse el servidor.
+- **`LLM_TIMEOUT_MS`:** se prueba el siguiente modelo de respaldo. Si fallan todos, el chat lo explica y la sesión sigue.
+
 ## API
 
 | Método | Ruta | Cuerpo / respuesta |
