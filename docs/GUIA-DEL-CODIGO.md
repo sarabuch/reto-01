@@ -93,3 +93,14 @@ Cada paso deja una línea en el log.
 | CA2, solo valores de herramientas | `agent/prompt.md` → "Regla de oro"; `generar_formulario` recalcula desde el maestro |
 | CA5, errores del modelo | `gemini.ts` → `mensajeClaro`; `ciclo.ts` muestra el error y la sesión sigue |
 | PRD 8, costo | `config.ts` → `maxIteraciones` y `maxTokensSesion` |
+
+## Despliegue (Render)
+
+- **Link:** https://reto-01-proveedor-i2ej.onrender.com/
+- **Servicio:** Web Service con entorno nativo (Node + Bun). `.bun-version` fija Bun 1.4.3.
+- **Build Command:** `bun install --frozen-lockfile` (instala exactamente las versiones de `bun.lock`).
+- **Start Command:** `bun run start` (corre `bun src/server.ts`). Render define `PORT` y el servidor lo usa.
+- **Health Check Path:** `/api/health`.
+- **Variables de entorno en Render:** solo `GEMINI_API_KEY`. El resto tiene valores por defecto en `src/config.ts`.
+- **Plan gratuito:** el servicio duerme tras 15 minutos sin uso y tarda unos 50 s en despertar. Además, al reiniciarse se borran `out/` y las sesiones, que viven en memoria. Antes de una demo hay que abrir `/api/health` y esperar la respuesta.
+- **Cada push a `main`** vuelve a desplegar automáticamente.

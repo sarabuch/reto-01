@@ -71,3 +71,21 @@ Lista acumulada de criterios del PRD revisados al cerrar cada bloque. Es la base
 | CA4: rótulo "LLAMADAS A HERRAMIENTAS"; cada tarjeta con nombre, argumentos y resultado | Cumple | navegador |
 | CA3 / RN4: recuadro "Requiere tu confirmación" con botones que mandan un mensaje explícito; se desactivan al mandar otro | Cumple | navegador: "Confirmar envío simulado" → `ENVIO-SIMULADO.md` aparece en el panel |
 | Seguridad: la ruta nueva rechaza nombres de caso peligrosos | Cumple | `curl` con `..%2F` y test "Panel del caso" |
+
+## Bloque 5: despliegue en Render (2026-10-19)
+
+Link: https://reto-01-proveedor-i2ej.onrender.com/
+
+| Criterio | Estado | Prueba |
+|---|---|---|
+| PRD 9.3: URL pública donde el agente responde | Cumple | `GET /api/health` → `{ ok: true, provider, model }`, sin claves |
+| Render con Bun nativo (sin Docker), versión fija 1.4.3 | Cumple | Build `bun install --frozen-lockfile`, Start `bun run start`, health check `/api/health` |
+| PRD 8: clave solo en variables de entorno del backend | Cumple | cargada por Sara María en el panel de Render; `/.env` → 404; ruta con `..` → 400 |
+| PRD 8: tope de costo con link público | Cumple | tope por sesión + tope diario global `MAX_TOKENS_DIA` |
+| PRD 11 en el link, turno 1: resumen estructurado, tool calls visibles, ruta `out/ec-corp-andina/`, faltantes, `listo_para_firma` y pregunta de cierre | Cumple | API en Render: 4 herramientas ✓, "⛔ no listo", cierre con pregunta de confirmación (74 s) |
+| PRD 11 en el link, turno 2: "envía" produce solo `ENVIO-SIMULADO.md` tras confirmación explícita | Cumple | `enviado: false` tras el turno 1 y `true` tras "envía" (que respondía a la pregunta del turno anterior) |
+| RN4 en el link: envío sin pregunta previa bloqueado | Cumple | primera prueba: ante "envía" el modelo intentó enviar y el servidor lo bloqueó |
+| CA5 en el link: errores del proveedor claros y la sesión sigue viva | Cumple | con Google saturado se mostró "El modelo de Google está saturado…" y el siguiente mensaje funcionó |
+| Front desplegado: dos columnas, panel con datos reales, confirmación con botones | Cumple | navegador en el link (incluye el arreglo del panel al agrandar la ventana) |
+| Latencia estable | Parcial | depende del plan gratuito de Gemini: el mismo turno tardó de 23 s a 74 s y a veces falló por saturación |
+| Envío exclusivo de la marca de confirmación para la pregunta de envío | No cumple | el modelo usó la marca en "¿Hay algún otro caso?"; ajuste del prompt propuesto a Sara María |
