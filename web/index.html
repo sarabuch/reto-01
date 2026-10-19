@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro como Proveedor</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Registro como Proveedor</h1>
+      <p class="sub">Agente de Periferia IT Group · <span id="modelo">conectando…</span></p>
+    </div>
+    <button id="nueva" type="button">Nueva sesión</button>
+  </header>
+
+  <main id="chat" aria-live="polite">
+    <div class="bienvenida" id="bienvenida">
+      <p>Hola. Puedo procesar solicitudes de registro como proveedor: lleno el formulario desde el repositorio maestro y armo el paquete para firma. Nunca envío nada sin tu confirmación.</p>
+      <p>Casos disponibles: <code>co-industrias-delta</code>, <code>ec-corp-andina</code>, <code>hn-agroexport-sula</code>, <code>pa-logistica-istmo</code>.</p>
+      <button type="button" class="sugerencia" data-texto='Procesa el caso "ec-corp-andina". Dime qué campos quedaron llenos, cuáles faltan, si el paquete está listo para firma y qué soportes debo actualizar. No envíes nada todavía.'>
+        Probar: procesar ec-corp-andina
+      </button>
+    </div>
+  </main>
+
+  <div id="pensando" hidden>El agente está pensando…</div>
+
+  <form id="formulario">
+    <textarea id="mensaje" rows="2" placeholder="Escribe un mensaje… (Enter para enviar, Shift+Enter para nueva línea)" required></textarea>
+    <button id="enviar" type="submit">Enviar</button>
+  </form>
+
+  <script src="app.js"></script>
+</body>
+</html>

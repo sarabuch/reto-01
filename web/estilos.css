@@ -1,0 +1,155 @@
+/* Estilos del chat: simples, legibles, en modo claro y oscuro. */
+:root {
+  --fondo: #f6f7f9;
+  --tarjeta: #ffffff;
+  --texto: #1d2330;
+  --suave: #5b6475;
+  --borde: #dde1e7;
+  --acento: #2f5bd3;
+  --usuario: #e8eefc;
+  --ok: #1f7a3d;
+  --error: #b42318;
+  --confirmar-fondo: #fff6d6;
+  --confirmar-borde: #e0a800;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #12151b;
+    --tarjeta: #1b2029;
+    --texto: #e6e9ef;
+    --suave: #9aa3b2;
+    --borde: #2c3340;
+    --acento: #7a9cff;
+    --usuario: #22304d;
+    --ok: #5fcf85;
+    --error: #ff8a80;
+    --confirmar-fondo: #3a3110;
+    --confirmar-borde: #e0b400;
+  }
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh; /* en celulares, se ajusta cuando aparece el teclado */
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--borde);
+  background: var(--tarjeta);
+}
+h1 { font-size: 18px; margin: 0; }
+.sub { margin: 0; color: var(--suave); font-size: 13px; }
+button {
+  font: inherit;
+  border: 1px solid var(--borde);
+  background: var(--tarjeta);
+  color: var(--texto);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+button:disabled { opacity: 0.5; cursor: wait; }
+
+main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+}
+.bienvenida, .mensaje {
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.mensaje.usuario { background: var(--usuario); align-self: flex-end; max-width: 85%; white-space: pre-wrap; }
+.mensaje.agente { align-self: stretch; }
+.mensaje.error { border-color: var(--error); }
+.mensaje p { margin: 0 0 8px; }
+.mensaje p:last-child { margin-bottom: 0; }
+.mensaje p.item { margin: 0 0 4px; display: flex; gap: 6px; }
+.mensaje p.item .marca { flex: none; min-width: 1.2em; color: var(--suave); }
+.mensaje p.nivel-1 { padding-left: 20px; }
+.mensaje p.nivel-2 { padding-left: 40px; }
+.mensaje p.nivel-3 { padding-left: 60px; }
+code { font-size: 13px; background: var(--fondo); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.sugerencia { margin-top: 4px; border-color: var(--acento); color: var(--acento); }
+
+/* Llamadas a herramientas (CA4) */
+.herramientas { margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; }
+details.tool {
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: var(--fondo);
+  font-size: 13px;
+}
+details.tool summary { cursor: pointer; padding: 6px 10px; list-style-position: inside; }
+details.tool .nombre { font-family: ui-monospace, Consolas, monospace; font-weight: 600; }
+details.tool .estado-ok { color: var(--ok); }
+details.tool .estado-error { color: var(--error); }
+details.tool pre {
+  margin: 0;
+  padding: 8px 10px;
+  border-top: 1px solid var(--borde);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+/* Pedido de confirmación resaltado (CA3) */
+.confirmacion {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 2px solid var(--confirmar-borde);
+  background: var(--confirmar-fondo);
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+#pensando {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 16px 8px;
+  color: var(--suave);
+  font-style: italic;
+}
+form {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--borde);
+  background: var(--tarjeta);
+}
+textarea {
+  flex: 1;
+  font: inherit;
+  resize: vertical;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--borde);
+  background: var(--fondo);
+  color: var(--texto);
+}
+#enviar { background: var(--acento); color: #fff; border-color: var(--acento); }
+
+@media (max-width: 600px) {
+  .mensaje.usuario { max-width: 100%; }
+  header { padding: 10px 12px; }
+}

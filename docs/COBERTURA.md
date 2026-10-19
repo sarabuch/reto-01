@@ -47,3 +47,17 @@ Lista acumulada de criterios del PRD revisados al cerrar cada bloque. Es la base
 | PRD 11, primer mensaje: resumen estructurado, tool calls, ruta, faltantes, estado y pregunta de cierre | Cumple | prueba real con `ec-corp-andina` (≈19.000 tokens, ≈6 s) |
 | PRD 11: "envía" genera `ENVIO-SIMULADO.md` solo tras confirmación explícita | Cumple | prueba real: "envía" → pregunta; "Sí, confirmo" → archivo |
 | Front que resalta la confirmación | Pendiente | Bloque 4 (la API ya devuelve `needsConfirmation`) |
+
+## Bloque 4: front de chat (2026-10-19)
+
+| Criterio | Estado | Prueba |
+|---|---|---|
+| PRD 6.1: historial de la conversación y campo de entrada | Cumple | navegador: flujo completo de `ec-corp-andina` |
+| PRD 6.1: indicador de "pensando" | Cumple | navegador: "El agente está pensando…" durante el turno |
+| PRD 6.1 / CA4: cada llamada a herramienta visible (nombre, argumentos y resultado resumido) | Cumple | navegador: 4 llamadas desplegables con ✓/✗ y resumen |
+| PRD 6.1 / CA3: resalta cuando el agente pide confirmación | Cumple | navegador: recuadro amarillo tras "envía" |
+| CA5: errores del servidor o de conexión en lenguaje claro | Cumple | código (`enviarMensaje`); el error de conexión no se forzó en el navegador |
+| El historial se recupera al recargar la página | Cumple | navegador: recarga con la sesión activa |
+| Uso en celular sin desplazamiento horizontal | Cumple | vista de 375 px: ancho de página = ancho de ventana |
+| Seguridad: el texto del servidor no se interpreta como HTML | Cumple | código (`escapar` antes de dar formato) |
+| PRD 8: un comando levanta front y backend | Cumple | `bun run dev` sirve `web/` y la API en el mismo puerto |

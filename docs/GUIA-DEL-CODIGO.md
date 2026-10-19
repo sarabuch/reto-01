@@ -48,6 +48,9 @@ Explicación en lenguaje simple de qué hace cada parte del proyecto. Se actuali
 | `src/llm/index.ts` | Elige el proveedor según `LLM_PROVIDER`. |
 | `src/config.ts` | Lee la configuración del `.env`: clave, modelo, topes de costo y tiempo de espera. |
 | `src/server.ts` | El servidor HTTP: `/api/chat`, `/api/sessions/:id`, `/api/health` y la página del chat (`web/`). |
+| `web/index.html` | La página del chat: encabezado con el modelo en uso, historial, campo de texto y botón de ejemplo. |
+| `web/estilos.css` | El aspecto visual, en modo claro y oscuro, adaptado a celular. La confirmación se pinta con un recuadro amarillo. |
+| `web/app.js` | La lógica del chat: envía mensajes a `/api/chat`, muestra el indicador "pensando", cada llamada a herramienta (desplegable con sus argumentos) y resalta el pedido de confirmación. Escapa todo el texto que llega del servidor para que no se interprete como código. |
 | `scripts/probar-clave.ts` | Prueba la clave de Gemini sin mostrarla. Comando: `bun run scripts/probar-clave.ts`. |
 | `tests/reglas.test.ts` | Pruebas chicas de las reglas críticas. Comando: `bun test`. |
 | `tests/ciclo.test.ts` | Pruebas del ciclo con un modelo falso (sin clave): tope, confirmación, errores. |
